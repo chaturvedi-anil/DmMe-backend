@@ -15,14 +15,25 @@ wss.on("connection", (socket) => {
         
         //@ts-ignore
         const parseMessage = JSON.parse(message); 
-        console.log("parseMessage : ", parseMessage);
 
         if (parseMessage.type === "join") {
+            
             allSocket.push({
                 socket, room: parseMessage.payload.roomId
             })
 
         }
+
+        if(parseMessage.type === "chat") {
+            const currentUserRoom = allSocket.find((x) => x.socket === socket)?.room;
+
+            allSocket.map((user) => {
+                if(user.room === currentUserRoom){
+                    user.socket.send(parseMessage.payload.message);
+                } 
+            });
+            
+        }   
         
     })
 });
